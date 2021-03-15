@@ -12,4 +12,5 @@ def calculate_path():
     w1 = request.args.get('w1')
     w2 = request.args.get('w2')
     breadth = request.args.get('breadth')
+
     return {'payload': search(w1, w2, int(breadth))}

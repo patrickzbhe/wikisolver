@@ -34,13 +34,19 @@ def rank(words, target, query_size):
 
 def search(w1, w2, breadth):
     # starts a breadth first search and returns a search history
+    if not w1.isalpha() or not w2.isalpha() or breadth > 100 or breadth < 1:
+        return []
+
     history = []
     visited = set()
     visited.add(w1)
     w1 = [w1]
     history.append([w1[::] + [compare(w1[0], w2)] + [0]])
-
+    loops = 0
     while w2 not in w1:
+        loops += 1
+        if loops > 100:
+            return []
         for i in range(len(w1)):
             result = rank(scraper.get_topics(
                 'https://en.wikipedia.org/wiki/' + w1[0]), w2, 100)
@@ -57,6 +63,19 @@ def search(w1, w2, breadth):
         history.append(w1[::])
         for i in range(len(w1)):
             w1[i] = w1[i][0]
-        print(w1)
+
+    for i in range(len(history[-1])):
+        if history[-1][i][0] == w2:
+            history[-1][i].append(1)
+        else:
+            history[-1][i].append(0)
+
+    for i in range(len(history) - 1, 1, -1):
+        for j in range(len(history[i])):
+            if history[i][j][3] == 1:
+                history[i-1][history[i][j][2]].append(1)
+        for k in range(len(history[i-1])):
+            if len(history[i-1][k]) < 4:
+                history[i-1][k].append(0)
 
     return history

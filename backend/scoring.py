@@ -1,5 +1,6 @@
 from nltk.corpus import wordnet
 import scraper
+import sys
 
 
 def compare(word1, word2):

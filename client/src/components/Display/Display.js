@@ -1,23 +1,33 @@
 import React, { useState, useEffect } from "react";
 import Xarrow from "react-xarrows";
 import queryString from 'query-string';
-import axios from 'axios';
 import Loader from "react-loader-spinner";
+import io from "socket.io-client";
 
-const API = axios.create({ baseURL: 'http://127.0.0.1:5000/' });
+const ENDPOINT = 'https://wikisolver.herokuapp.com/';
 
+let socket;
 const Display = ({ location }) => {
     const [graphData, setGraphData] = useState([]);
     const [horizontal, setHorizontal] = useState(true);
-  
+
     useEffect(() => {
-        async function fetchApi() {
-            const { w1, w2, breadth } = queryString.parse(location.search);
-            let result = await API.get(`/find?w1=${w1}&w2=${w2}&breadth=${breadth}`);
-            setGraphData(result.data.payload);
-        }
-        fetchApi();
-    }, [location.search]);
+        const { w1, w2, breadth } = queryString.parse(location.search);
+    
+        socket = io.connect(ENDPOINT);
+ 
+        socket.emit('get', { w1, w2, breadth }, (error) => {
+          if(error) {
+            alert(error);
+          }
+        });
+      }, [ location.search]);
+
+    useEffect(() => {
+        socket.on('data', data => {
+            setGraphData(data.payload);
+        });
+    }, []);
     
 
     if (horizontal) {

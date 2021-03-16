@@ -1,10 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
 
+INVALID = ['Special', ':']
+
 
 def is_valid(link):
     # makes sure link is a legit topic
-    INVALID = ['Special', ':']
 
     # have to use and this way to avoid indexing error
     if link != None and link[:5] == '/wiki':
@@ -18,9 +19,12 @@ def is_valid(link):
     return True
 
 
+valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+
 def trim_link(link):
     # trim off brackets and wiki part
-    valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
     link = link[6:]
     output = ''
     deleting = False

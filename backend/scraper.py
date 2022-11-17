@@ -5,10 +5,9 @@ INVALID = ['Special', ':']
 
 
 def is_valid(link):
-    # makes sure link is a legit topic
+    '''makes sure link is a legit topic'''
 
-    # have to use and this way to avoid indexing error
-    if link != None and link[:5] == '/wiki':
+    if link and link[:5] == '/wiki':
         pass
     else:
         return False
@@ -19,11 +18,11 @@ def is_valid(link):
     return True
 
 
-valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+valid = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 
 
 def trim_link(link):
-    # trim off brackets and wiki part
+    ''' trim off brackets and wiki part '''
 
     link = link[6:]
     output = ''
@@ -45,7 +44,7 @@ def trim_link(link):
 
 
 def get_topics(url):
-    # scrapes all valid URLs from the wikipedia page
+    ''' scrapes all valid URLs from the wikipedia page '''
     topics = set()
     page = requests.get(url)
     soup = BeautifulSoup(page.content, 'html.parser')

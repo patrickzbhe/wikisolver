@@ -2,9 +2,10 @@ from nltk.corpus import wordnet
 import scraper
 import sys
 
+WIKIPEDIA_URL = 'https://en.wikipedia.org/wiki/'
 
 def compare(word1, word2):
-    # compares two words and calculates how similar they are
+    ''' compares two words and calculates how similar they are '''
     if word1 == word2:
         return 2
     syn1 = wordnet.synsets(word1)
@@ -21,8 +22,8 @@ def compare(word1, word2):
 
 
 def rank(words, target, query_size):
-    # takes a list of words and calculates each words similarity to the target, redefining each element to be a 2-d array
-    # also only returns a query_size amount of words at most, with highest similarity taking priority
+    ''' takes a list of words and calculates each words similarity to the target, redefining each element to be a 2-d array
+     also only returns a query_size amount of words at most, with highest similarity taking priority '''
     for i in range(len(words)):
         words[i] = [words[i], compare(words[i], target)]
 
@@ -33,8 +34,19 @@ def rank(words, target, query_size):
     return words[-1 * query_size:]
 
 
+def backfill_history(history):
+    ''' Fill in path to final word '''
+    for i in range(len(history) - 1, 1, -1):
+        for j in range(len(history[i])):
+            if history[i][j][3] == 1:
+                history[i-1][history[i][j][2]].append(1)
+        for k in range(len(history[i-1])):
+            if len(history[i-1][k]) < 4:
+                history[i-1][k].append(0)
+
+
 def search(w1, w2, breadth):
-    # starts a breadth first search and returns a search history
+    ''' starts a breadth first search and returns a search history '''
     if not w1.isalpha() or not w2.isalpha() or breadth > 100 or breadth < 1:
         return []
 
@@ -49,8 +61,7 @@ def search(w1, w2, breadth):
         if loops > 100:
             return []
         for i in range(len(w1)):
-            result = rank(scraper.get_topics(
-                'https://en.wikipedia.org/wiki/' + w1[0]), w2, 100)
+            result = rank(scraper.get_topics(WIKIPEDIA_URL + w1[0]), w2, 100)
             for j in range(len(result)-1, -1, -1):
                 if result[j][0] in visited:
                     del result[j]
@@ -70,13 +81,5 @@ def search(w1, w2, breadth):
             history[-1][i].append(1)
         else:
             history[-1][i].append(0)
-
-    for i in range(len(history) - 1, 1, -1):
-        for j in range(len(history[i])):
-            if history[i][j][3] == 1:
-                history[i-1][history[i][j][2]].append(1)
-        for k in range(len(history[i-1])):
-            if len(history[i-1][k]) < 4:
-                history[i-1][k].append(0)
 
     return history
